@@ -86,6 +86,7 @@ router.post('/', authMiddleware, async (req, res) => {
         // Create and save transaction
         const transaction = new Transaction({
             userId: patientId,
+            doctorId:doctorId,
             appointmentId: appointment._id,
             type: 'appointment_payment',
             amount: payment.finalAmount,
@@ -121,6 +122,7 @@ router.post('/', authMiddleware, async (req, res) => {
 });
 
 // Get appointments
+// Patient route
 router.get('/my-appointments', authMiddleware, async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
@@ -196,5 +198,57 @@ router.get('/my-appointments', authMiddleware, async (req, res) => {
         });
     }
 });
+router.get('/doctor/:doctorId', async (req, res) => {
+    try {
+        const { doctorId } = req.params;
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
 
+        let query = { doctorId };
+        
+        if (req.query.status) query.status = req.query.status;
+        if (req.query.fromDate || req.query.toDate) {
+            query.date = {};
+            if (req.query.fromDate) query.date.$gte = new Date(req.query.fromDate);
+            if (req.query.toDate) query.date.$lte = new Date(req.query.toDate);
+        }
+
+        const [appointments, totalAppointments] = await Promise.all([
+            Appointment.find(query)
+                .sort({ date: -1, 'slot.startTime': -1 })
+                .skip(skip)
+                .limit(limit)
+                .populate('patientId', 'email profile')
+                .lean(),
+            Appointment.countDocuments(query)
+        ]);
+
+        const totalPages = Math.ceil(totalAppointments / limit);
+        const enhancedAppointments = appointments.map(appointment => ({
+            ...appointment,
+            isPast: new Date(appointment.date) < new Date(),
+            canMarkComplete: appointment.status === 'scheduled' && new Date(appointment.date) < new Date(),
+            canCancel: appointment.status === 'scheduled' && 
+                      new Date(appointment.date) > new Date(Date.now() + 24 * 60 * 60 * 1000)
+        }));
+
+        res.json({
+            message: 'Appointments retrieved successfully',
+            data: {
+                appointments: enhancedAppointments,
+                pagination: {
+                    currentPage: page,
+                    totalPages,
+                    totalAppointments,
+                    hasNextPage: page < totalPages,
+                    hasPrevPage: page > 1
+                }
+            }
+        });
+    } catch (error) {
+        console.error('Fetch doctor appointments error:', error);
+        res.status(500).json({ message: 'Error fetching appointments', error: error.message });
+    }
+});
 module.exports = router;

@@ -6,6 +6,11 @@ const transactionSchema = new mongoose.Schema({
     ref: 'User',
     required: true
   },
+  doctorId: {  // Added doctorId reference
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Doctor',
+    required: true
+  },
   appointmentId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Appointment',
@@ -36,8 +41,5 @@ const transactionSchema = new mongoose.Schema({
     refundReason: String
   }
 }, { timestamps: true });
-
-transactionSchema.index({ userId: 1, appointmentId: 1 });
-transactionSchema.index({ createdAt: -1 });
 
 module.exports = mongoose.model('Transaction', transactionSchema);

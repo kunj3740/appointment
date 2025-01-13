@@ -40,8 +40,9 @@ export default function WalletPage() {
   useEffect(() => {
     // Fetch user details from localStorage
     const user = JSON.parse(localStorage.getItem('user') || '{}');
+    console.log(user)
     const token = localStorage.getItem('token');
-
+    
     if (!user || !token) {
       console.error('User or token not found in localStorage');
       return;
@@ -71,7 +72,7 @@ export default function WalletPage() {
   }, []);
 
   return (
-    <div className="container mx-auto py-8">
+    <div className="container mx-auto h-screen  py-8 " >
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="md:col-span-1">
           <BalanceCard balance={balance} />
@@ -81,5 +82,6 @@ export default function WalletPage() {
         </div>
       </div>
     </div>
+    
   );
 }

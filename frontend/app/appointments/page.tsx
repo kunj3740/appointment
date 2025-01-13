@@ -3,23 +3,8 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
+import { Appointment } from '../types';
 
-interface Appointment {
-  _id: string;
-  date: string;
-  status: string;
-  slot: {
-    startTime: string;
-    endTime: string;
-  };
-  doctorId: {
-    name: string;
-    specialization: string;
-    consultationFee: number;
-    firstTimeDiscount: number;
-  };
-  isPast: boolean;
-}
 
 export default function MyAppointmentsPage() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
@@ -61,61 +46,84 @@ export default function MyAppointmentsPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white text-slate-700">
-        <p>Loading your appointments...</p>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-50 to-indigo-50">
+        <div className="bg-white p-8 rounded-lg shadow-lg">
+          <div className="animate-pulse flex space-x-4">
+            <div className="rounded-full bg-slate-200 h-12 w-12"></div>
+            <div className="flex-1 space-y-4 py-1">
+              <div className="h-4 bg-slate-200 rounded w-3/4"></div>
+              <div className="space-y-2">
+                <div className="h-4 bg-slate-200 rounded"></div>
+                <div className="h-4 bg-slate-200 rounded w-5/6"></div>
+              </div>
+            </div>
+          </div>
+          <p className="text-center mt-4 text-slate-600">Loading your appointments...</p>
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white text-slate-700">
-        <p className="text-red-500">{error}</p>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-50 to-indigo-50">
+        <div className="bg-white p-8 rounded-lg shadow-lg">
+          <p className="text-red-500 text-center font-semibold">{error}</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-white text-slate-700 py-8 px-4">
-      <h1 className="text-3xl font-bold mb-6 text-center">My Appointments</h1>
-      {appointments.length === 0 ? (
-        <p className="text-center text-slate-500">You have no appointments.</p>
-      ) : (
-        <div className="space-y-6">
-          {appointments.map((appointment) => (
-            <div key={appointment._id} className="border border-slate-300 p-4 rounded-lg shadow-md">
-              <div className="flex justify-between">
-                <div>
-                  <h2 className="text-lg font-semibold text-slate-900">{appointment.doctorId.name}</h2>
-                  <p className="text-sm text-slate-500">{appointment.doctorId.specialization}</p>
+    <div className="min-h-screen bg-gradient-to-r from-blue-50 to-indigo-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-3xl mx-auto">
+        <h1 className="text-4xl font-extrabold mb-8 text-center text-indigo-900">My Appointments</h1>
+        {appointments.length === 0 ? (
+          <div className="bg-white p-8 rounded-lg shadow-lg text-center">
+            <p className="text-slate-500 text-lg">You have no appointments.</p>
+          </div>
+        ) : (
+          <div className="space-y-6">
+            {appointments.map((appointment) => (
+              <div key={appointment._id} className="bg-white border border-slate-200 p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h2 className="text-xl font-bold text-indigo-900">{appointment.doctorId.name}</h2>
+                    <p className="text-sm text-indigo-600 mt-1">{appointment.doctorId.specialization}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm font-medium text-slate-700">{appointment.date}</p>
+                    <p className="text-sm text-slate-500 mt-1">
+                      {appointment.slot.startTime} - {appointment.slot.endTime}
+                    </p>
+                  </div>
                 </div>
-                <div className="text-right">
-                  <p className="text-sm">{appointment.date}</p>
-                  <p className="text-sm">
-                    {appointment.slot.startTime} - {appointment.slot.endTime}
+                <div className="mt-6 flex justify-between items-center">
+                  <p className={`text-sm font-semibold px-3 py-1 rounded-full ${
+                    appointment.isPast
+                      ? 'bg-slate-100 text-slate-600'
+                      : 'bg-green-100 text-green-700'
+                  }`}>
+                    {appointment.isPast ? 'Past Appointment' : 'Upcoming Appointment'}
+                  </p>
+                  <p
+                    className={`text-sm font-semibold px-3 py-1 rounded-full ${
+                      appointment.status === 'scheduled'
+                        ? 'bg-blue-100 text-blue-700'
+                        : appointment.status === 'completed'
+                        ? 'bg-green-100 text-green-700'
+                        : 'bg-red-100 text-red-700'
+                    }`}
+                  >
+                    {appointment.status.charAt(0).toUpperCase() + appointment.status.slice(1)}
                   </p>
                 </div>
               </div>
-              <div className="mt-4 flex justify-between">
-                <p className={`text-sm font-medium ${appointment.isPast ? 'text-slate-500' : 'text-green-600'}`}>
-                  {appointment.isPast ? 'Past Appointment' : 'Upcoming Appointment'}
-                </p>
-                <p
-                  className={`text-sm ${
-                    appointment.status === 'scheduled'
-                      ? 'text-blue-600'
-                      : appointment.status === 'completed'
-                      ? 'text-green-600'
-                      : 'text-red-600'
-                  }`}
-                >
-                  {appointment.status.charAt(0).toUpperCase() + appointment.status.slice(1)}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
+

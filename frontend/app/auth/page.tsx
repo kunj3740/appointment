@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { Eye, EyeOff, ArrowRight } from 'lucide-react';
+import { Eye, EyeOff, ArrowRight, UserCircle2 } from 'lucide-react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 
@@ -17,7 +17,6 @@ export default function AuthPage() {
     lastName: '',
     phone: '',
     address: '',
-    walletBalance: '',
     appointedDoctors:[] // Added initial wallet balance field
   });
 
@@ -42,7 +41,6 @@ export default function AuthPage() {
               phone: formData.phone,
               address: formData.address
             },
-            walletBalance: parseFloat(formData.walletBalance) || 0 // Convert to number and default to 0
           };
 
           const response: any = await axios.post(
@@ -97,7 +95,7 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white flex">
+    <div className="min-h-screen mt-[-65px] bg-white flex">
       {/* Left Panel - Black */}
       <div className="hidden lg:flex lg:flex-1 bg-black items-center justify-center p-12">
         <div className="max-w-md text-white">
@@ -223,26 +221,7 @@ export default function AuthPage() {
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-black focus:border-black"
                   />
                 </div>
-                {/* New Wallet Balance Field */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Initial Wallet Balance (₹)
-                  </label>
-                  <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">₹</span>
-                    <input
-                      type="text"
-                      name="walletBalance"
-                      value={formData.walletBalance}
-                      onChange={handleChange}
-                      className="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-black focus:border-black"
-                      placeholder="0.00"
-                    />
-                  </div>
-                  <p className="mt-1 text-sm text-gray-500">
-                    Optional: Add initial balance to your wallet
-                  </p>
-                </div>
+                
               </>
             )}
 
@@ -269,6 +248,17 @@ export default function AuthPage() {
               {isLogin ? 'Sign Up' : 'Sign In'}
             </button>
           </p>
+          <div className="mt-6 text-center w-full">
+            <button
+              onClick={() => route.push('/doctor/auth')}
+              className="w-full px-6 py-2.5 bg-gradient-to-r from-blue-700 to-blue-800 text-white rounded-lg 
+                         shadow-md hover:shadow-lg transform hover:scale-105 transition-all 
+                         font-semibold text-sm flex items-center justify-center mx-auto space-x-2"
+            >
+              <UserCircle2 size={18} />
+              <span>Login as Doctor</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>

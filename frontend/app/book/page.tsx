@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import type { Doctor } from '@/app/types';
 import { DoctorCard } from '@/components/doctors/doctor-card';
 import axios from 'axios';
+import { toast } from 'sonner';
 
 const TIME_SLOTS = ['09:00', '10:00', '11:00', '14:00', '15:00', '16:00'] as const;
 
@@ -35,7 +36,7 @@ export default function AppointmentsPage() {
         if ( response.status >= 400 ) {
           throw new Error('Failed to fetch doctor details');
         }
-
+        
         const data = response.data;
         setDoctor(data.doctor);
       } catch (err) {
@@ -105,7 +106,8 @@ export default function AppointmentsPage() {
       alert(response.data.message); // Optional success message
       router.push('/wallet');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to book appointment.');
+      alert("Recharge Needed:: ");
+      router.push('/wallet');
     }
   };
 

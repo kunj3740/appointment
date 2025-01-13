@@ -15,17 +15,37 @@ export interface Patient {
 }
 
 export interface Appointment {
-  id: string;
-  doctorId: string;
-  patientId: string;
+  _id: string;
   date: string;
-  time: string;
-  status: 'pending' | 'confirmed' | 'completed' | 'cancelled';
-  originalAmount: number;
-  discountedAmount: number;
-  isFirstTime: boolean;
+  status: string;
+  slot: {
+    startTime: string;
+    endTime: string;
+  };
+  doctorId: {
+    name: string;
+    specialization: string;
+    consultationFee: number;
+    firstTimeDiscount: number;
+  };
+  isPast: boolean;
 }
-
+export interface AppointmentForDoctor {
+  _id: string
+  patientId: {
+    profile: {
+      firstName: string
+      phone: string
+    }
+  }
+  date: string
+  slot: {
+    startTime: string
+    endTime: string
+  }
+  status: string
+  isPast: boolean
+}
 export interface Transaction {
   id: string;
   appointmentId: string;

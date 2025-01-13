@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { Calendar, Wallet, BarChart3, LogIn, User } from 'lucide-react';
 import {
@@ -47,14 +47,13 @@ function NavigationItem({
 export function Navigation() {
   const pathname = usePathname();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-
+  const router = useRouter();
   useEffect(() => {
     const token = localStorage.getItem('token');
-    if( token ){
+    if (token) {
       setIsAuthenticated(true);
-    }
-    else{
-      setIsAuthenticated(false);
+    } else {
+      router.push('/auth'); // Redirect to /auth if not authenticated
     }
   }, []);
 
